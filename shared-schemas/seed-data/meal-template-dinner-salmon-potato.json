@@ -1,0 +1,79 @@
+{
+  "id": "dinner_salmon_potato_001",
+  "name": "Baked Salmon with Roasted Potatoes and Asparagus",
+  "description": "A nutrient-dense dinner featuring omega-3 rich salmon, roasted potatoes, and green vegetables.",
+  "category": "dinner",
+  "mealTime": "evening",
+  "difficulty": "easy",
+  "prepTime": 10,
+  "cookTime": 25,
+  "totalTime": 35,
+  "servings": 1,
+  "dietaryTags": ["omnivore", "high_protein", "gluten_free"],
+  "excludedAllergens": [],
+  "macros": {
+    "protein": 38,
+    "carbs": 42,
+    "fat": 18,
+    "calories": 478
+  },
+  "ingredients": [
+    {
+      "item": "salmon fillet",
+      "amount": "150g (5 oz)",
+      "category": "protein_source",
+      "optional": false
+    },
+    {
+      "item": "baby potatoes",
+      "amount": "200g (approximately 6-8 small potatoes)",
+      "category": "carb_source",
+      "optional": false
+    },
+    {
+      "item": "asparagus spears",
+      "amount": "150g (1 bundle)",
+      "category": "vegetable",
+      "optional": false
+    },
+    {
+      "item": "olive oil",
+      "amount": "1.5 tsp",
+      "category": "fat_source",
+      "optional": false
+    },
+    {
+      "item": "lemon",
+      "amount": "1/2 lemon (juice and zest)",
+      "category": "condiment",
+      "optional": false
+    },
+    {
+      "item": "garlic, minced",
+      "amount": "2 cloves",
+      "category": "condiment",
+      "optional": true
+    },
+    {
+      "item": "fresh dill or parsley",
+      "amount": "1 tbsp, chopped",
+      "category": "condiment",
+      "optional": true
+    },
+    {
+      "item": "salt and pepper",
+      "amount": "to taste",
+      "category": "condiment",
+      "optional": true
+    }
+  ],
+  "instructions": "1. Preheat oven to 400°F (200°C).\n2. Cut baby potatoes in half and toss with 1 tsp olive oil, salt, and pepper. Spread on a baking sheet.\n3. Roast potatoes for 15 minutes.\n4. Meanwhile, pat salmon dry and season with salt, pepper, lemon zest, and minced garlic.\n5. Trim asparagus ends and toss with 0.5 tsp olive oil.\n6. After 15 minutes, add salmon and asparagus to the baking sheet with potatoes.\n7. Roast for another 12-15 minutes until salmon flakes easily and vegetables are tender.\n8. Squeeze fresh lemon juice over salmon and garnish with dill or parsley.\n9. Serve immediately.",
+  "substitutions": {
+    "salmon": ["cod", "halibut", "chicken breast"],
+    "baby potatoes": ["sweet potato", "butternut squash", "rice"],
+    "asparagus": ["broccoli", "green beans", "brussels sprouts"],
+    "dill": ["parsley", "cilantro", "basil"]
+  },
+  "tags": ["one-pan", "omega-3", "heart-healthy", "meal-prep-friendly"],
+  "createdAt": "2026-01-26T00:00:00Z"
+}

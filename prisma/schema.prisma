@@ -1,0 +1,504 @@
+// PrimeCell Complete Prisma Schema - Phase 2
+// Version: 2.0
+// Status: Production Ready
+//
+// CRITICAL PRINCIPLES:
+// 1. All models are IMMUTABLE except ActivePlanPointer
+// 2. DecisionRecords are append-only (audit trail)
+// 3. Plans are versioned and never updated in place
+// 4. Supplements are CORE components (not optional)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Note: Using SQLite for local development (no Docker/PostgreSQL needed)
+// For production with PostgreSQL:
+// 1. Change provider to "postgresql"
+// 2. Update DATABASE_URL to PostgreSQL connection string
+// 3. Run: npx prisma migrate reset && npx prisma migrate dev
+
+// ============================================================================
+// USER & AUTH
+// ============================================================================
+
+model User {
+  id                  String              @id @default(cuid())
+  email               String              @unique
+  name                String
+  passwordHash        String
+  onboardingComplete  Boolean             @default(false)
+
+  // Push notification settings
+  pushToken           String?
+  pushEnabled         Boolean             @default(true)
+  dailyRemindersEnabled Boolean           @default(true)
+
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  // Relations
+  onboardingData      OnboardingData?
+  checkins            WeeklyCheckin[]
+  nutritionPlans      NutritionPlan[]
+  trainingPrograms    TrainingProgram[]
+  supplementRecommendations SupplementRecommendation[]
+  decisionRecords     DecisionRecord[]
+  activePlanPointer   ActivePlanPointer?
+  notifications       NotificationSchedule[]
+  mealLogs            MealLog[]
+
+  @@map("users")
+}
+
+// ============================================================================
+// ONBOARDING DATA (Phase 1 - Initial Assessment)
+// ============================================================================
+
+model OnboardingData {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Step 1: Personal Data
+  age             Int
+  sex             String   // "male" | "female"
+  height          Float    // cm
+  weight          Float    // kg
+  photoUrl        String?
+
+  // Step 2: Goal Selection
+  primaryGoal     String   // "lose_fat" | "lose_weight" | "gain_muscle" | "health_energy" | "performance" | "longevity"
+  goalSpecific    String   @default("{}")  // JSON: goal-specific questions (waistTarget, weightLossTarget, etc.)
+
+  // Step 3: Lifestyle & Routine
+  lifestyle       String   @default("{}")  // JSON: workType, sleepHours, stressLevel, trainingSchedule
+
+  // Step 4: Training & Energy Expenditure
+  training        String   @default("{}")  // JSON: frequency, types, intensity
+
+  // Step 5: Food Preferences
+  foodPreferences String   @default("{}")  // JSON: mealsPerDay, preferredCarbSources, excludedFoods, etc.
+
+  // Step 6: Health & Metabolic Safety
+  healthInfo      String   @default("{}")  // JSON: diagnosedConditions, digestion, regularMedications, etc.
+
+  // Step 7: Social Life & Adherence
+  adherence       String   @default("{}")  // JSON: mealsOutsidePerWeek, planStructurePreference, previousDietExperience
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("onboarding_data")
+}
+
+// ============================================================================
+// WEEKLY CHECK-IN (Phase 2 - Recurring Input)
+// ============================================================================
+
+model WeeklyCheckin {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  weekNumber  Int      // Week number since onboarding (1, 2, 3, ...)
+
+  // Step 1: Body Metrics
+  weight      Float?   // kg (optional for privacy)
+  waist       Float?   // cm (optional)
+  photoUrl    String?
+
+  // Step 2: Subjective Signals (0-10 scale)
+  energy      Int      // 0-10
+  hunger      Int      // 0-10
+  sleep       Int      // 0-10
+  stress      Int      // 0-10
+
+  // Step 3: Adherence Level
+  adherence   String   // "100" | "80-90" | "60-70" | "<60"
+
+  // Step 4: Contextual Events
+  events      String   @default("[]")  // JSON array: ["meals_outside", "travel", "illness", etc.]
+  notes       String?  // Optional user notes (max 500 chars)
+
+  // Step 5: Self-Perception
+  perception  String   // "progressing" | "same_confident" | "frustrated" | "unsure"
+
+  createdAt   DateTime @default(now())
+
+  @@map("weekly_checkins")
+  @@index([userId, weekNumber])
+  @@index([userId, createdAt])
+}
+
+// ============================================================================
+// NUTRITION PLANS (Immutable, Versioned)
+// ============================================================================
+
+model NutritionPlan {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  version          Int      // Plan version number (1, 2, 3, ...)
+
+  // Nutrition mode (from state machine)
+  mode             String   // "deficit" | "maintenance" | "surplus" | "reverse_diet"
+
+  // Daily calorie target (guideline, not strict counting)
+  caloriesMin      Int?     // Minimum calories (safety floor)
+  caloriesMax      Int?     // Maximum calories (safety ceiling)
+  caloriesTarget   Int      // Target calories
+
+  // Macronutrient guidelines (approximate)
+  proteinGrams     Int      // Protein target (g/day)
+  carbsGrams       Int      // Carbs target (g/day)
+  fatGrams         Int      // Fat target (g/day)
+
+  // Meal structure
+  mealsPerDay      Int      // 3, 4, or 5
+  mealTemplates    String   @default("[]")  // JSON array of meal template IDs
+
+  // Daily guidelines (real food philosophy)
+  guidelines       String   @default("{}")  // JSON: { vegetables: "4-5 servings", protein: "palm-sized portions", etc. }
+
+  // Explanation (from AI layer)
+  explanation      String   @default("{}")  // JSON: { progressSummary, whyThisDecision, whatToDoNext }
+
+  createdAt        DateTime @default(now())
+
+  @@map("nutrition_plans")
+  @@index([userId, version])
+  @@unique([userId, version])
+}
+
+// ============================================================================
+// TRAINING PROGRAMS (Immutable, Versioned)
+// ============================================================================
+
+model TrainingProgram {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  version     Int      // Program version (1, 2, 3, ...)
+
+  // Training mode (from state machine)
+  mode        String   // "build" | "maintain" | "deload" | "minimal"
+
+  // Program selection
+  programId   String   // "beginner_upper_lower" | "intermediate_ppl" | "advanced_4day" | etc.
+  weekNumber  Int      // Current week within program cycle
+
+  // Volume/intensity adjustments
+  volumeAdjustment   Int @default(0)  // -20 to +20 (percent)
+  intensityLevel     String           // "standard" | "increased" | "reduced"
+
+  // Deload info
+  isDeloadWeek       Boolean @default(false)
+  deloadReason       String?          // "fatigue" | "recovery" | "planned_cycle"
+
+  // Adjustments (JSON)
+  adjustments        String @default("{}")  // { exerciseModifications: [...], restChanges: ... }
+
+  createdAt   DateTime @default(now())
+
+  @@map("training_programs")
+  @@index([userId, version])
+  @@unique([userId, version])
+}
+
+// ============================================================================
+// SUPPLEMENT RECOMMENDATIONS (CORE COMPONENT - Not Optional!)
+// ============================================================================
+
+model Supplement {
+  id               String   @id @default(cuid())
+
+  // Product information
+  productName      String   @unique  // "KyoSlim" | "CreaPrime Creatine" | "Shape Protein"
+  category         String              // "fat_loss" | "muscle_gain" | "protein_support"
+  description      String              // Product description
+
+  // Dosage information
+  recommendedDosage String             // "2 capsules/day" | "5g/day" | "1-2 servings/day"
+  timingGuidelines  String             // "Morning with breakfast" | "Post-workout" | "Any time"
+
+  // Goal mapping (which goals this supplement supports)
+  primaryGoals     String   @default("[]")  // JSON array: ["lose_fat", "lose_weight"]
+  supportGoals     String   @default("[]")  // JSON array: goals it supports but isn't primary for
+
+  // Product details
+  benefits         String   @default("[]")  // JSON array: ["Supports metabolism", "Reduces appetite", etc.]
+  ingredients      String?                  // Optional ingredient list
+
+  // Priority level
+  priority         String                   // "critical" | "high" | "support"
+
+  // Product URL (for future e-commerce integration)
+  productUrl       String?
+
+  // Status
+  isActive         Boolean  @default(true)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  recommendations  SupplementRecommendation[]
+
+  @@map("supplements")
+}
+
+model SupplementRecommendation {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  supplementId     String
+  supplement       Supplement @relation(fields: [supplementId], references: [id])
+
+  // Plan version this recommendation belongs to
+  nutritionPlanVersion Int   // Links to NutritionPlan.version
+  trainingPlanVersion  Int   // Links to TrainingProgram.version
+
+  // Recommendation context
+  priority         String   // "primary" | "support" | "optional"
+  reason           String   // Why this supplement is recommended
+
+  // Usage instructions
+  dosageInstructions String // Personalized dosage instructions
+  timingInstructions String // When to take it
+
+  // Status
+  isActive         Boolean  @default(true)
+
+  createdAt        DateTime @default(now())
+
+  @@map("supplement_recommendations")
+  @@index([userId, nutritionPlanVersion])
+  @@index([userId, isActive])
+}
+
+// ============================================================================
+// DECISION RECORDS (Append-Only Audit Trail)
+// ============================================================================
+
+model DecisionRecord {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Context (onboarding or check-in)
+  triggerType     String   // "onboarding" | "checkin"
+  triggerDataId   String?  // ID of onboarding or checkin
+
+  // Input snapshot (JSON from checkin or onboarding)
+  inputSnapshot   String   @default("{}")
+
+  // Phase 1: Signal Interpretation
+  derivedSignals  String   @default("{}")  // JSON: { weightTrend, waistTrend, energyScore, adherenceScore, etc. }
+
+  // Phase 2: State Machine
+  currentState    String   @default("{}")  // JSON: { nutritionMode, trainingMode, weekInCycle, etc. }
+
+  // Phase 3: Action Selection
+  actionsTaken    String   @default("{}")  // JSON: { nutritionChanges, trainingChanges, supplementChanges }
+
+  // Rules fired
+  rulesFired      String   @default("[]")  // JSON array: [{ ruleId, ruleName, outcome }, ...]
+
+  // Guardrails applied
+  guardrails      String   @default("[]")  // JSON array: [{ guardrailName, originalValue, adjustedValue }, ...]
+
+  // Final plan versions created
+  nutritionPlanId String?
+  trainingPlanId  String?
+
+  // Supplement recommendations
+  supplementsRecommended String @default("[]")  // JSON array: [{ supplementId, priority, reason }, ...]
+
+  // Engine metadata
+  engineVersion   String   // "1.0.0"
+  rulePackVersion String   // "v1"
+
+  // AI explanation (from ChatGPT layer)
+  aiExplanation   String?  // JSON: { progressSummary, whyThisDecision, whatToDoNext }
+
+  createdAt       DateTime @default(now())
+
+  @@map("decision_records")
+  @@index([userId, createdAt])
+  @@index([triggerType, createdAt])
+}
+
+// ============================================================================
+// ACTIVE PLAN POINTER (Mutable - Only Pointer, Not Plan Data)
+// ============================================================================
+
+model ActivePlanPointer {
+  userId           String   @id
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Current active plan versions
+  nutritionPlanVersion Int
+  trainingPlanVersion  Int
+
+  // Week tracking
+  currentWeek          Int  @default(1)  // Current week since onboarding
+  lastCheckinDate      DateTime?         // Last check-in submission date
+
+  updatedAt        DateTime @updatedAt
+
+  @@map("active_plan_pointers")
+}
+
+// ============================================================================
+// CONTENT TEMPLATES (Meal Templates & Training Programs)
+// ============================================================================
+
+model MealTemplate {
+  id               String   @id @default(cuid())
+
+  // Template identification
+  templateId       String   @unique  // "breakfast_eggs_avocado_001"
+  name             String              // "Scrambled Eggs with Avocado"
+  category         String              // "breakfast" | "lunch" | "dinner" | "snack"
+
+  // Meal composition
+  description      String              // Brief description
+  ingredients      String   @default("[]")  // JSON array: [{ item, quantity }, ...]
+
+  // Approximate macros (not for strict counting, just guidance)
+  approxCalories   Int
+  approxProtein    Int      // grams
+  approxCarbs      Int      // grams
+  approxFat        Int      // grams
+
+  // Tags for filtering
+  tags             String   @default("[]")  // JSON array: ["high_protein", "quick", "vegetarian", etc.]
+  excludedFoods    String   @default("[]")  // JSON array: ["dairy", "gluten", etc.]
+
+  // Difficulty and timing
+  prepTime         Int?     // minutes
+  difficulty       String   // "easy" | "moderate" | "advanced"
+
+  // Status
+  isActive         Boolean  @default(true)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("meal_templates")
+  @@index([category])
+  @@index([isActive])
+}
+
+model TrainingProgramTemplate {
+  id               String   @id @default(cuid())
+
+  // Program identification
+  programId        String   @unique  // "beginner_upper_lower"
+  name             String              // "Beginner Upper/Lower Split"
+  level            String              // "beginner" | "intermediate" | "advanced"
+
+  // Program structure
+  description      String              // Program overview
+  daysPerWeek      Int                 // 2, 3, 4, 5, 6
+  programLength    Int                 // weeks (e.g., 8, 12)
+
+  // Program data (JSON)
+  workouts         String   @default("[]")  // JSON array: [{ day, exercises: [...] }, ...]
+  deloadSchedule   String   @default("{}")  // JSON: { frequency: "every_4_weeks", ... }
+  progressionRules String   @default("{}")  // JSON: { overloadType: "linear", ... }
+
+  // Suitability
+  trainingTypes    String   @default("[]")  // JSON array: ["weight_training", "home_workouts"]
+  equipment        String   @default("[]")  // JSON array: ["barbell", "dumbbells", "bodyweight"]
+
+  // Status
+  isActive         Boolean  @default(true)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("training_program_templates")
+  @@index([level])
+  @@index([isActive])
+}
+
+// ============================================================================
+// PUSH NOTIFICATIONS
+// ============================================================================
+
+model NotificationSchedule {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Notification type
+  type             String   // "checkin_reminder" | "daily_motivation" | "missed_checkin"
+
+  // Scheduling
+  scheduledFor     DateTime
+  sentAt           DateTime?
+
+  // Notification content
+  title            String
+  body             String
+  deepLink         String?  // e.g., "app://checkin" for deep linking
+
+  // Status
+  status           String   @default("pending")  // "pending" | "sent" | "failed"
+  failureReason    String?
+
+  createdAt        DateTime @default(now())
+
+  @@map("notification_schedules")
+  @@index([userId, scheduledFor])
+  @@index([status, scheduledFor])
+}
+
+// ============================================================================
+// MEAL LOGGING
+// ============================================================================
+
+model MealLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Meal details
+  name        String
+  calories    Int
+  protein     Float
+  carbs       Float
+  fat         Float
+  category    String   // "breakfast" | "lunch" | "dinner" | "snack"
+
+  // Timing
+  loggedAt    DateTime @default(now())
+  date        String   // YYYY-MM-DD for easy daily queries
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("meal_logs")
+  @@index([userId, date])
+}
+
+// ============================================================================
+// INDEXES FOR PERFORMANCE
+// ============================================================================
+
+// Note: Additional indexes are defined inline above using @@index
+// Key indexes:
+// - User lookup by email (unique)
+// - Weekly check-ins by user and date
+// - Plans by user and version
+// - Decision records by user and creation time
+// - Supplement recommendations by user and active status
+// - Notifications by user and scheduled time

@@ -1,0 +1,275 @@
+{
+  "version": "v1",
+  "createdAt": "2026-01-26",
+  "description": "PrimeCell Rule Pack v1 - Initial MVP thresholds and safety constraints",
+
+  "calorieAdjustments": {
+    "candidateDeltas": [-200, -150, -100, -50, 0, 50, 100, 150, 200],
+    "deadband": 50,
+    "maxWeeklyChange": 200,
+    "comment": "Finite set of calorie adjustments, prefer smaller changes (cost scoring)"
+  },
+
+  "safetyConstraints": {
+    "calorieFloor": {
+      "female": 1200,
+      "male": 1500,
+      "comment": "Absolute minimum daily calories"
+    },
+    "maxDeficitPercent": 25,
+    "maxSurplusPercent": 20,
+    "proteinMinimum": {
+      "deficit": 1.6,
+      "surplus": 1.8,
+      "unit": "g/kg bodyweight",
+      "comment": "Minimum protein to preserve muscle mass"
+    },
+    "comment": "Safety floors and ceilings to prevent unhealthy extremes"
+  },
+
+  "trendAnalysis": {
+    "trendWindow": 3,
+    "trendWindowUnit": "weeks",
+    "confidenceScoreWeights": {
+      "adherence": 0.4,
+      "dataQuality": 0.3,
+      "eventImpact": 0.3
+    },
+    "minimumConfidenceForAction": 0.7,
+    "plateauThreshold": {
+      "maxWeightChange": 0.2,
+      "maxWeightChangeUnit": "kg over 3 weeks",
+      "minAdherence": 80,
+      "minAdherenceUnit": "%"
+    },
+    "recompThreshold": {
+      "weightChangeRange": [-0.2, 0.2],
+      "weightChangeRangeUnit": "kg over 3 weeks",
+      "minWaistDecrease": -0.5,
+      "minWaistDecreaseUnit": "cm over 3 weeks"
+    },
+    "comment": "Parameters for trend smoothing and signal interpretation"
+  },
+
+  "recoveryRiskScoring": {
+    "formula": "(10 - energy) * 0.3 + hunger * 0.3 + (10 - sleep) * 0.2 + stress * 0.2",
+    "weights": {
+      "energy": 0.3,
+      "hunger": 0.3,
+      "sleep": 0.2,
+      "stress": 0.2
+    },
+    "thresholds": {
+      "low": {
+        "max": 4.0,
+        "action": "Progress as planned"
+      },
+      "moderate": {
+        "min": 4.0,
+        "max": 6.5,
+        "action": "Monitor closely, no aggressive changes"
+      },
+      "high": {
+        "min": 6.5,
+        "max": 8.0,
+        "action": "Hold current plan or slight increase"
+      },
+      "critical": {
+        "min": 8.0,
+        "action": "Enter recovery mode, increase calories +150-200"
+      }
+    },
+    "comment": "Recovery risk assessment from subjective signals"
+  },
+
+  "stateMachineLocks": {
+    "antiReversalLock": {
+      "duration": 2,
+      "durationUnit": "weeks",
+      "comment": "Prevent yo-yo effect (e.g., reduce then immediately increase calories)"
+    },
+    "programLock": {
+      "duration": 4,
+      "durationUnit": "weeks",
+      "comment": "Minimum time to stay on a training program for adaptation"
+    },
+    "deloadFrequency": {
+      "min": 4,
+      "max": 6,
+      "unit": "weeks",
+      "comment": "Schedule deload every 4-6 weeks"
+    }
+  },
+
+  "nutritionModes": {
+    "CUT_ACTIVE": {
+      "description": "Active calorie deficit with progress",
+      "transitions": {
+        "to_CUT_HOLD": "Plateau detected (stable weight for 3 weeks with >80% adherence)",
+        "to_CUT_RECOVERY": "Critical recovery risk detected",
+        "to_MAINTAIN": "Goal achieved"
+      }
+    },
+    "CUT_HOLD": {
+      "description": "Maintain current deficit, monitoring plateau",
+      "transitions": {
+        "to_CUT_ACTIVE": "Plateau broken (weight decreasing again)",
+        "to_CUT_RECOVERY": "Critical recovery risk detected"
+      }
+    },
+    "CUT_RECOVERY": {
+      "description": "Temporary increase to restore metabolic function",
+      "transitions": {
+        "to_CUT_ACTIVE": "Recovery signals normalized"
+      },
+      "duration": "1-2 weeks"
+    },
+    "MAINTAIN": {
+      "description": "Maintenance calories, no deficit or surplus",
+      "transitions": {
+        "to_CUT_ACTIVE": "User changes goal to fat loss",
+        "to_GAIN_ACTIVE": "User changes goal to muscle gain"
+      }
+    },
+    "GAIN_ACTIVE": {
+      "description": "Active calorie surplus with progress",
+      "transitions": {
+        "to_GAIN_HOLD": "High recovery risk or plateau",
+        "to_MAINTAIN": "Goal achieved"
+      }
+    },
+    "GAIN_HOLD": {
+      "description": "Maintain current surplus, monitoring recovery",
+      "transitions": {
+        "to_GAIN_ACTIVE": "Recovery signals normalized"
+      }
+    }
+  },
+
+  "trainingModes": {
+    "PROGRESS": {
+      "description": "Increase volume or intensity progressively",
+      "volumeAdjustment": [1.05, 1.10],
+      "intensityAdjustment": [1.0, 1.05],
+      "comment": "Alternate between volume and intensity progression"
+    },
+    "HOLD": {
+      "description": "Maintain current training load",
+      "volumeAdjustment": 1.0,
+      "intensityAdjustment": 1.0,
+      "triggers": ["High recovery risk", "Low adherence", "Contextual disruption"]
+    },
+    "DELOAD": {
+      "description": "Reduce volume for recovery",
+      "volumeAdjustment": 0.6,
+      "intensityAdjustment": 1.0,
+      "duration": "1 week",
+      "comment": "-40% volume, maintain intensity"
+    }
+  },
+
+  "trainingProgression": {
+    "volumeAdjustmentSteps": [-0.10, -0.05, 0, 0.05, 0.10],
+    "intensityAdjustmentSteps": [-0.10, -0.05, 0, 0.05],
+    "deloadReduction": -0.40,
+    "comment": "Discrete progression steps for training volume and intensity"
+  },
+
+  "adherenceMapping": {
+    "100": {
+      "score": 1.0,
+      "description": "Followed almost everything"
+    },
+    "80-90": {
+      "score": 0.85,
+      "description": "Made small adaptations"
+    },
+    "60-70": {
+      "score": 0.65,
+      "description": "Had several deviations"
+    },
+    "<60": {
+      "score": 0.4,
+      "description": "Difficult week"
+    }
+  },
+
+  "eventImpact": {
+    "meals_outside": 0.05,
+    "travel": 0.15,
+    "illness": 0.20,
+    "hormonal_changes": 0.10,
+    "emotional_stress": 0.10,
+    "poor_sleep": 0.15,
+    "no_events": 0.0,
+    "comment": "Impact score reduction per event (cumulative)"
+  },
+
+  "goalSpecificDefaults": {
+    "lose_fat": {
+      "initialDeficit": 15,
+      "initialDeficitUnit": "% below TDEE",
+      "proteinTarget": 2.0,
+      "proteinUnit": "g/kg",
+      "supplements": ["KyoSlim", "Shape Protein"]
+    },
+    "lose_weight": {
+      "initialDeficit": 20,
+      "initialDeficitUnit": "% below TDEE",
+      "proteinTarget": 1.8,
+      "proteinUnit": "g/kg",
+      "supplements": ["KyoSlim", "Shape Protein"]
+    },
+    "gain_muscle": {
+      "initialSurplus": 10,
+      "initialSurplusUnit": "% above TDEE",
+      "proteinTarget": 2.2,
+      "proteinUnit": "g/kg",
+      "supplements": ["CreaPrime Creatine", "Shape Protein"]
+    },
+    "health_energy": {
+      "initialDeficit": 0,
+      "proteinTarget": 1.6,
+      "proteinUnit": "g/kg",
+      "supplements": ["Shape Protein"]
+    },
+    "performance": {
+      "initialSurplus": 5,
+      "initialSurplusUnit": "% above TDEE",
+      "proteinTarget": 2.0,
+      "proteinUnit": "g/kg",
+      "supplements": ["CreaPrime Creatine", "Shape Protein"]
+    },
+    "longevity": {
+      "initialDeficit": 0,
+      "proteinTarget": 1.6,
+      "proteinUnit": "g/kg",
+      "supplements": ["Shape Protein"]
+    }
+  },
+
+  "macroDistribution": {
+    "protein": {
+      "priority": 1,
+      "calculation": "Fixed based on bodyweight and goal"
+    },
+    "fat": {
+      "priority": 2,
+      "minimum": 0.8,
+      "maximum": 1.2,
+      "unit": "g/kg bodyweight"
+    },
+    "carbs": {
+      "priority": 3,
+      "calculation": "Remaining calories after protein and fat"
+    }
+  },
+
+  "metadata": {
+    "engineVersion": "1.0.0",
+    "compatibleEngineVersions": ["1.0.x"],
+    "deprecated": false,
+    "nextVersion": null,
+    "changeLog": "Initial rule pack for MVP launch"
+  }
+}

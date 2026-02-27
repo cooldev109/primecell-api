@@ -1,0 +1,247 @@
+{
+  "id": "upper_lower_4day_intermediate",
+  "name": "Upper/Lower 4-Day Split",
+  "description": "A classic 4-day upper/lower split focusing on compound movements with progressive overload. Ideal for intermediate lifters looking to build strength and muscle mass.",
+  "frequency": 4,
+  "durationWeeks": 8,
+  "difficulty": "intermediate",
+  "equipment": ["barbell", "dumbbells", "cables", "machines"],
+  "goals": ["muscle_gain", "strength"],
+  "split": "Upper/Lower",
+  "weeks": [
+    {
+      "week": 1,
+      "sessions": [
+        {
+          "day": 1,
+          "name": "Upper A",
+          "focus": "Push & Pull",
+          "exercises": [
+            {
+              "name": "Barbell Bench Press",
+              "sets": 4,
+              "reps": "8-10",
+              "restSeconds": 120,
+              "progressionType": "weight",
+              "equipment": ["barbell", "bench"]
+            },
+            {
+              "name": "Barbell Bent Over Row",
+              "sets": 4,
+              "reps": "8-10",
+              "restSeconds": 120,
+              "progressionType": "weight",
+              "equipment": ["barbell"]
+            },
+            {
+              "name": "Dumbbell Shoulder Press",
+              "sets": 3,
+              "reps": "10-12",
+              "restSeconds": 90,
+              "progressionType": "weight",
+              "equipment": ["dumbbells"]
+            },
+            {
+              "name": "Lat Pulldown",
+              "sets": 3,
+              "reps": "10-12",
+              "restSeconds": 90,
+              "progressionType": "weight",
+              "equipment": ["cable machine"]
+            },
+            {
+              "name": "Cable Tricep Pushdown",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "progressionType": "weight",
+              "equipment": ["cable machine"]
+            },
+            {
+              "name": "Dumbbell Bicep Curl",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "progressionType": "weight",
+              "equipment": ["dumbbells"]
+            }
+          ],
+          "estimatedDuration": "60 minutes"
+        },
+        {
+          "day": 2,
+          "name": "Lower A",
+          "focus": "Quads & Glutes",
+          "exercises": [
+            {
+              "name": "Barbell Back Squat",
+              "sets": 4,
+              "reps": "8-10",
+              "restSeconds": 180,
+              "progressionType": "weight",
+              "equipment": ["barbell", "squat rack"]
+            },
+            {
+              "name": "Romanian Deadlift",
+              "sets": 3,
+              "reps": "10-12",
+              "restSeconds": 120,
+              "progressionType": "weight",
+              "equipment": ["barbell"]
+            },
+            {
+              "name": "Leg Press",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 90,
+              "progressionType": "weight",
+              "equipment": ["leg press machine"]
+            },
+            {
+              "name": "Walking Lunges",
+              "sets": 3,
+              "reps": "12 per leg",
+              "restSeconds": 90,
+              "progressionType": "weight",
+              "equipment": ["dumbbells"],
+              "notes": "Hold dumbbells at sides"
+            },
+            {
+              "name": "Leg Curl",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "progressionType": "weight",
+              "equipment": ["leg curl machine"]
+            },
+            {
+              "name": "Standing Calf Raise",
+              "sets": 4,
+              "reps": "15-20",
+              "restSeconds": 45,
+              "progressionType": "weight",
+              "equipment": ["calf raise machine"]
+            }
+          ],
+          "estimatedDuration": "65 minutes"
+        },
+        {
+          "day": 4,
+          "name": "Upper B",
+          "focus": "Push & Pull",
+          "exercises": [
+            {
+              "name": "Incline Dumbbell Press",
+              "sets": 4,
+              "reps": "8-10",
+              "restSeconds": 120,
+              "progressionType": "weight",
+              "equipment": ["dumbbells", "incline bench"]
+            },
+            {
+              "name": "Pull-Ups",
+              "sets": 4,
+              "reps": "AMRAP",
+              "restSeconds": 120,
+              "progressionType": "weight",
+              "equipment": ["pull-up bar"],
+              "notes": "Add weight if you can do 12+ reps"
+            },
+            {
+              "name": "Dumbbell Lateral Raise",
+              "sets": 4,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "progressionType": "weight",
+              "equipment": ["dumbbells"]
+            },
+            {
+              "name": "Seated Cable Row",
+              "sets": 3,
+              "reps": "10-12",
+              "restSeconds": 90,
+              "progressionType": "weight",
+              "equipment": ["cable machine"]
+            },
+            {
+              "name": "Overhead Tricep Extension",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "progressionType": "weight",
+              "equipment": ["dumbbell"]
+            },
+            {
+              "name": "Hammer Curl",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "progressionType": "weight",
+              "equipment": ["dumbbells"]
+            }
+          ],
+          "estimatedDuration": "60 minutes"
+        },
+        {
+          "day": 5,
+          "name": "Lower B",
+          "focus": "Hamstrings & Glutes",
+          "exercises": [
+            {
+              "name": "Barbell Deadlift",
+              "sets": 4,
+              "reps": "6-8",
+              "restSeconds": 180,
+              "progressionType": "weight",
+              "equipment": ["barbell"]
+            },
+            {
+              "name": "Bulgarian Split Squat",
+              "sets": 3,
+              "reps": "10-12 per leg",
+              "restSeconds": 120,
+              "progressionType": "weight",
+              "equipment": ["dumbbells", "bench"]
+            },
+            {
+              "name": "Leg Extension",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 90,
+              "progressionType": "weight",
+              "equipment": ["leg extension machine"]
+            },
+            {
+              "name": "Hip Thrust",
+              "sets": 4,
+              "reps": "10-12",
+              "restSeconds": 90,
+              "progressionType": "weight",
+              "equipment": ["barbell", "bench"]
+            },
+            {
+              "name": "Nordic Hamstring Curl",
+              "sets": 3,
+              "reps": "6-10",
+              "restSeconds": 90,
+              "progressionType": "reps",
+              "equipment": ["bodyweight"],
+              "notes": "Use assistance if needed"
+            },
+            {
+              "name": "Seated Calf Raise",
+              "sets": 4,
+              "reps": "15-20",
+              "restSeconds": 45,
+              "progressionType": "weight",
+              "equipment": ["seated calf raise machine"]
+            }
+          ],
+          "estimatedDuration": "65 minutes"
+        }
+      ],
+      "notes": "Week 1: Establish baseline. Focus on proper form and controlled tempo."
+    }
+  ],
+  "createdAt": "2026-01-26T00:00:00Z"
+}

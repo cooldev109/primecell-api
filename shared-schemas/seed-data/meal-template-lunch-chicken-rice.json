@@ -1,0 +1,79 @@
+{
+  "id": "lunch_chicken_rice_001",
+  "name": "Grilled Chicken with Rice and Vegetables",
+  "description": "A balanced, macro-friendly lunch with lean protein, complex carbs, and fiber-rich vegetables.",
+  "category": "lunch",
+  "mealTime": "midday",
+  "difficulty": "easy",
+  "prepTime": 10,
+  "cookTime": 20,
+  "totalTime": 30,
+  "servings": 1,
+  "dietaryTags": ["omnivore", "high_protein", "gluten_free"],
+  "excludedAllergens": [],
+  "macros": {
+    "protein": 42,
+    "carbs": 52,
+    "fat": 12,
+    "calories": 468
+  },
+  "ingredients": [
+    {
+      "item": "chicken breast",
+      "amount": "150g (5 oz, raw weight)",
+      "category": "protein_source",
+      "optional": false
+    },
+    {
+      "item": "white or brown rice",
+      "amount": "80g dry (approximately 200g cooked)",
+      "category": "carb_source",
+      "optional": false
+    },
+    {
+      "item": "mixed vegetables (broccoli, carrots, bell peppers)",
+      "amount": "150g (1.5 cups)",
+      "category": "vegetable",
+      "optional": false
+    },
+    {
+      "item": "olive oil",
+      "amount": "1 tsp",
+      "category": "fat_source",
+      "optional": false
+    },
+    {
+      "item": "garlic powder",
+      "amount": "1/2 tsp",
+      "category": "condiment",
+      "optional": true
+    },
+    {
+      "item": "paprika",
+      "amount": "1/2 tsp",
+      "category": "condiment",
+      "optional": true
+    },
+    {
+      "item": "salt and pepper",
+      "amount": "to taste",
+      "category": "condiment",
+      "optional": true
+    },
+    {
+      "item": "lemon juice",
+      "amount": "1 tbsp",
+      "category": "condiment",
+      "optional": true
+    }
+  ],
+  "instructions": "1. Cook rice according to package directions.\n2. Season chicken breast with garlic powder, paprika, salt, and pepper.\n3. Heat a grill pan or skillet over medium-high heat with olive oil.\n4. Grill chicken for 6-7 minutes per side until internal temperature reaches 165°F (74°C).\n5. While chicken cooks, steam or sauté vegetables until tender-crisp (5-7 minutes).\n6. Slice chicken and serve over rice with vegetables on the side.\n7. Drizzle with lemon juice for extra flavor.",
+  "substitutions": {
+    "chicken breast": ["turkey breast", "lean ground turkey", "tofu"],
+    "rice": ["quinoa", "sweet potato", "pasta"],
+    "vegetables": ["green beans", "zucchini", "asparagus", "spinach"],
+    "olive oil": ["avocado oil", "coconut oil"]
+  },
+  "tags": ["meal-prep-friendly", "high-protein", "balanced"],
+  "createdAt": "2026-01-26T00:00:00Z"
+}

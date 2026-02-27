@@ -1,0 +1,67 @@
+{
+  "id": "breakfast_protein_oats_001",
+  "name": "Protein Oats with Berries",
+  "description": "A high-protein breakfast combining oats, protein powder, and fresh berries for sustained energy.",
+  "category": "breakfast",
+  "mealTime": "morning",
+  "difficulty": "easy",
+  "prepTime": 5,
+  "cookTime": 5,
+  "totalTime": 10,
+  "servings": 1,
+  "dietaryTags": ["vegetarian", "high_protein"],
+  "excludedAllergens": [],
+  "macros": {
+    "protein": 35,
+    "carbs": 48,
+    "fat": 10,
+    "calories": 418
+  },
+  "ingredients": [
+    {
+      "item": "rolled oats",
+      "amount": "60g (1/2 cup dry)",
+      "category": "carb_source",
+      "optional": false
+    },
+    {
+      "item": "protein powder (vanilla or unflavored)",
+      "amount": "30g (1 scoop)",
+      "category": "protein_source",
+      "optional": false
+    },
+    {
+      "item": "almond milk or milk of choice",
+      "amount": "200ml (3/4 cup)",
+      "category": "other",
+      "optional": false
+    },
+    {
+      "item": "mixed berries (blueberries, strawberries)",
+      "amount": "80g (1/2 cup)",
+      "category": "fruit",
+      "optional": false
+    },
+    {
+      "item": "ground cinnamon",
+      "amount": "1/2 tsp",
+      "category": "condiment",
+      "optional": true
+    },
+    {
+      "item": "almonds, chopped",
+      "amount": "10g (small handful)",
+      "category": "fat_source",
+      "optional": true
+    }
+  ],
+  "instructions": "1. Cook oats with almond milk according to package directions (microwave 2-3 minutes or stovetop 5 minutes).\n2. Once cooked, stir in protein powder while oats are still hot.\n3. Top with fresh berries, cinnamon, and chopped almonds.\n4. Serve immediately. Add a splash more milk if too thick.",
+  "substitutions": {
+    "oats": ["quinoa flakes", "cream of rice"],
+    "berries": ["banana", "apple slices", "mango"],
+    "almond milk": ["regular milk", "soy milk", "oat milk"],
+    "almonds": ["walnuts", "pecans", "pumpkin seeds"]
+  },
+  "tags": ["quick", "meal-prep-friendly", "high-protein", "breakfast"],
+  "createdAt": "2026-01-26T00:00:00Z"
+}

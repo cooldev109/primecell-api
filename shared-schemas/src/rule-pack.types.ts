@@ -170,4 +170,4 @@ export interface RulePack {
 
 // Import the actual rule pack
 import rulePack from './rule-pack-v1.json';
-export const RULE_PACK_V1: RulePack = rulePack as RulePack;
+export const RULE_PACK_V1: RulePack = rulePack as unknown as RulePack;

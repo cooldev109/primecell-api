@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as rulePack from '../../../../../packages/shared-schemas/src/rule-pack-v1.json';
+import * as rulePack from '../../../shared-schemas/src/rule-pack-v1.json';
 
 interface SubjectiveSignals {
   energy: number;

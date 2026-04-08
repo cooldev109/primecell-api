@@ -82,10 +82,14 @@ export function generateNutritionPlan(input: NutritionPlanInput): NutritionPlan 
   };
   const energyResult = calculateTargetCalories(energyInput);
 
+  // Clamp to minimum safe calories
+  const MIN_SAFE_CALORIES = gender === 'male' ? 1500 : 1200;
+  const targetCalories = Math.max(energyResult.targetCalories, MIN_SAFE_CALORIES);
+
   // Step 3: Calculate macros
   const macroInput: MacroInput = {
     weight,
-    targetCalories: energyResult.targetCalories,
+    targetCalories,
     goal,
     activityLevel,
   };
@@ -93,7 +97,7 @@ export function generateNutritionPlan(input: NutritionPlanInput): NutritionPlan 
 
   // Step 4: Validate safety
   const validation = validateNutritionPlan(
-    energyResult.targetCalories,
+    targetCalories,
     macroResult.protein,
     weight,
     gender,
@@ -105,13 +109,13 @@ export function generateNutritionPlan(input: NutritionPlanInput): NutritionPlan 
   const safetyConstraints = getSafetyConstraints(weight, gender, tdeeResult.tdee);
 
   // Step 6: Calculate per-meal breakdown
-  const caloriesPerMeal = Math.round(energyResult.targetCalories / mealsPerDay);
+  const caloriesPerMeal = Math.round(targetCalories / mealsPerDay);
 
   return {
     // Calculated values
     bmr: tdeeResult.bmr,
     tdee: tdeeResult.tdee,
-    targetCalories: energyResult.targetCalories,
+    targetCalories,
     protein: macroResult.protein,
     fat: macroResult.fat,
     carbs: macroResult.carbs,
